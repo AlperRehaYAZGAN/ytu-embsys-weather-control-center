@@ -116,7 +116,7 @@ def emit_new_values():
         pass
     # save entries to database
     try:
-        database.save(lux,air_quality,temperature,humidity,water_level,water_temp,int(result[0]))
+        database.save(lux,air_quality,temperature,humidity,water_level,water_temp,0)
         print("Kaydedildi")
         pass
     except:
