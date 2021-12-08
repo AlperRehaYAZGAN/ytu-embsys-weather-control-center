@@ -54,46 +54,40 @@ class EntrySqlite():
 database = EntrySqlite()
 
 
+
 @app.route('/')
-def hello():
+def get_all():
+    allEntries = database.all()    
+    return render_template("index.html",rows = allEntries, msg = "Sisteme kayıtlı girdi(entry) kayıtlarını getirdi.")
+
+
+@app.route('/save')
+def save_sensor_values():
     air_quality = int(request.args.get('air',0))
     temperature = int(request.args.get('temp',0))
     lux = int(request.args.get('lux',0))
     humidity = int(request.args.get('humidity',0))
     water_level = int(request.args.get('wlevel',0))
     water_temp = int(request.args.get('wtemp',0))
-    
-    isOk = database.save(lux,air_quality,temperature,humidity,water_level,water_temp,0)
-    
-    if(isOk):
-        print("Kaydedildi")
-        pass
-    else:
-        print("Hata meydana geldi.")
-        pass
 
-    if(air_quality == 0 and temperature == 0 and lux == 0):
-        return "No sensor value ensured"
-    return str(0)
+    try:
+        isOk = database.save(lux,air_quality,temperature,humidity,water_level,water_temp,0)
+        if(air_quality == 0 and temperature == 0 and lux == 0):
+            return "No sensor value ensured. Usage: http://SERVER/save?air=10&temp=10&lux=10&wtemp=20&wlevel=10&humidity=20"
+        else:
+            return "Saved successfully"
+    except:
+        return "Error occured while inserting database"
 
 
-# http://localhost:5000/new?air=10&temp=10&lux=10&wtemp=20&wlevel=10&humidity=20
-@app.route('/db')
+@app.route('/history')
 def get_db_all():
     allEntries = database.all()    
     return render_template("db.html",rows = allEntries, msg = "Sisteme kayıtlı girdi(entry) kayıtlarını getirdi.")
 
 
-
-@app.route('/all')
-def get_all():
-    allEntries = database.all()    
-    return render_template("index.html",rows = allEntries, msg = "Sisteme kayıtlı girdi(entry) kayıtlarını getirdi.")
-
-
-# http://localhost:5000/new?air=10&temp=10&lux=10&wtemp=20&wlevel=10&humidity=20
 @app.route('/new')
-def set_new():
+def emit_new_values():
     air_quality = int(request.args.get('air',0))
     temperature = int(request.args.get('temp',0))
     lux = int(request.args.get('lux',0))
@@ -102,7 +96,7 @@ def set_new():
     water_temp = int(request.args.get('wtemp',0))
 
     if(air_quality == 0 and lux == 0 and temperature == 0):
-        return "No value ensured"
+        return "No value ensured usage: http://SERVER/new?air=10&temp=10&lux=10&wtemp=20&wlevel=10&humidity=20"
     
     new_values = {
         "air" : air_quality,
