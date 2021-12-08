@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Sensor Arayüzü</title>
+    <link rel="stylesheet" href="/css/search.css" />
+    <link href="https://netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet"
+        id="bootstrap-css">
+    <script src="https://netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+
+</head>
+
+<body style="font-family: Helvetica">
+
+
+    <div class="container">
+        <div class="row">
+            <br>
+            <br>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="well well-sm">
+                    <div class="row">
+                        <div class="col-md-12 text-center">
+                            <h1 class="rating-num">
+                                Sensör İzleme Admin Monitörü
+                            </h1>
+                            <h4>
+                                En son güncelleme : <span id="latest_date">Veri Bulunamadı. Lütfen bağlantıyı kontrol
+                                    ediniz</span>
+                            </h4>
+                            <br>
+                            <h4>
+                                AI Model Çıktısı : <span id="txtresult">-</span>
+                            </h4>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="well well-sm shadow p-3 mb-5 bg-white rounded">
+                    <div class="row">
+
+                        <div class="col-md-12">
+
+                            <!-- HERE IT IS CHART -->
+                            <div id="charttemp" style="height: 360px; width:100%;"></div>
+
+                            <!-- end row -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="well well-sm shadow p-3 mb-5 bg-white rounded">
+                    <div class="row">
+
+                        <div class="col-md-12">
+
+                            <!-- HERE IT IS CHART -->
+                            <div id="chartwtemp" style="height: 360px; width:100%;"></div>
+
+                            <!-- end row -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="well well-sm">
+                    <div class="row">
+
+                        <div class="col-md-12">
+
+                            <!-- HERE IT IS CHART -->
+                            <div id="chartair" style="height: 360px; width:100%;"></div>
+
+                            <!-- end row -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="well well-sm">
+                    <div class="row">
+
+                        <div class="col-md-12">
+
+                            <!-- HERE IT IS CHART -->
+                            <div id="chartlux" style="height: 360px; width:100%;"></div>
+
+                            <!-- end row -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="well well-sm">
+                    <div class="row">
+
+                        <div class="col-md-12">
+
+                            <!-- HERE IT IS CHART -->
+                            <div id="chartwlevel" style="height: 360px; width:100%;"></div>
+
+                            <!-- end row -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="well well-sm">
+                    <div class="row">
+
+                        <div class="col-md-12">
+
+                            <!-- HERE IT IS CHART -->
+                            <div id="charthumidity" style="height: 360px; width:100%;"></div>
+
+                            <!-- end row -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
+        integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
+        crossorigin="anonymous"></script>
+    <script type="text/javascript" charset="utf-8">
+        var arrLux = [];
+        var arrAir = [];
+        var arrTemp = [];
+        var arrWLevel = [];
+        var arrWTemp = [];
+        var arrHumidity = [];
+        var arrResult = [];
+
+        var dataLength = 10; // MAX DATA POINTS
+
+        var xHumidityVal = 0;
+        var yHumidityVal = 100;
+        var chartHumidity = new CanvasJS.Chart("charthumidity", {
+            animationEnabled: true,
+            zoomEnabled: true,
+            title: {
+                text: "Humidity (%0-100)"
+            },
+            data: [{
+                type: "line",
+                dataPoints: arrHumidity
+            }]
+        });
+
+
+        var xWLevelVal = 0;
+        var yWLevelVal = 100;
+        var chartWLevel = new CanvasJS.Chart("chartwlevel", {
+            animationEnabled: true,
+            zoomEnabled: true,
+            title: {
+                text: "Water Level (0-400)"
+            },
+            data: [{
+                type: "line",
+                dataPoints: arrWLevel
+            }]
+        });
+
+        var xWTempVal = 0;
+        var yWTempVal = 100;
+        var chartWTemp = new CanvasJS.Chart("chartwtemp", {
+            animationEnabled: true,
+            zoomEnabled: true,
+            title: {
+                text: "Water Temperature (*C)"
+            },
+            data: [{
+                type: "line",
+                dataPoints: arrWTemp
+            }]
+        });
+
+        var xAirVal = 0;
+        var yAirVal = 100;
+        var chartAir = new CanvasJS.Chart("chartair", {
+            animationEnabled: true,
+            zoomEnabled: true,
+            title: {
+                text: "Air Quality (0-800) "
+            },
+            data: [{
+                type: "line",
+                dataPoints: arrAir
+            }]
+        });
+        var xLuxVal = 0;
+        var yLuxVal = 100;
+        var chartLux = new CanvasJS.Chart("chartlux", {
+            animationEnabled: true,
+            zoomEnabled: true,
+            title: {
+                text: "Lux Sensor (0-4000)"
+            },
+            data: [{
+                type: "line",
+                dataPoints: arrLux
+            }]
+        });
+        var xTempVal = 0;
+        var yTempVal = 100;
+        var chartTemp = new CanvasJS.Chart("charttemp", {
+            animationEnabled: true,
+            zoomEnabled: true,
+            title: {
+                text: "Temperature Sensor (*C)"
+            },
+            data: [{
+                type: "line",
+                dataPoints: arrTemp
+            }]
+        });
+
+
+        var updateChartsNewValue = function (valueAir = 0, valueTemp = 0, valueLux = 0,valueHumidity = 0, valueWLevel = 0, valueWTemp = 0, valueResult = 0) {
+            // update Water Temp
+            arrHumidity.push({
+                x: xHumidityVal,
+                y: valueHumidity
+            });
+            xHumidityVal++;
+            if (arrHumidity.length > dataLength) {
+                arrHumidity.shift();
+            }
+
+            // update Water Temp
+            arrWTemp.push({
+                x: xWTempVal,
+                y: valueWTemp
+            });
+            xWTempVal++;
+            if (arrWTemp.length > dataLength) {
+                arrWTemp.shift();
+            }
+
+            // update Water Level
+            arrWLevel.push({
+                x: xWLevelVal,
+                y: valueWLevel
+            });
+            xWLevelVal++;
+            if (arrWLevel.length > dataLength) {
+                arrWLevel.shift();
+            }
+
+            // update air
+            arrAir.push({
+                x: xAirVal,
+                y: valueAir
+            });
+            xAirVal++;
+            if (arrAir.length > dataLength) {
+                arrAir.shift();
+            }
+
+            // update temp
+            arrTemp.push({
+                x: xTempVal,
+                y: valueTemp
+            });
+            xTempVal++;
+            if (arrTemp.length > dataLength) {
+                arrTemp.shift();
+            }
+
+            // update lux
+            arrLux.push({
+                x: xLuxVal,
+                y: valueLux
+            });
+            xLuxVal++;
+            if (arrLux.length > dataLength) {
+                arrLux.shift();
+            }
+
+            chartAir.render();
+            chartLux.render();
+            chartTemp.render();
+            chartHumidity.render();
+            chartWLevel.render();
+            chartWTemp.render();
+            $('#latest_date').text(new Date().toLocaleString());
+            let message = "İçerik Yok";
+            switch (valueResult) {
+                case 0:
+                    message = "Aksiyon yok";
+                    break;
+                case 1:
+                    message = "Işığı Aç";
+                    break;
+                case 2:
+                    message = "Fanı Aç";
+                    break;
+                case 3:
+                    message = "Havayı Isıt";
+                    break;
+                case 4:
+                    message = "Işığı Aç + Fanı Aç";
+                    break;
+                case 5:
+                    message = "Işığı Aç + Havayı Isıt";
+                    break;
+                case 6:
+                    message = "Fanı Aç + Havayı Isıt";
+                    break;
+                case 7:
+                    message = "Işığı Aç + Fanı Aç + Havayı Isıt";
+                    break;
+                default:
+                    break;
+            }
+            $('#txtresult').text(message);
+        };
+
+        var socket = io();
+        socket.on('connect', function () {
+            console.log("Connected sto admin dasboard server.");
+        });
+
+        // update sensor values
+        socket.on('new-values', function (data) {
+            console.log(data);
+
+            $('#txtdate').text(latest_date);
+            updateChartsNewValue(data.air, data.temp, data.lux, data.humidity, data.wlevel, data.wtemp, data.result);
+        });
+
+        /* Deneme modunu kapatmak icin asagi baslangic ve bitis kismini yorum satirina aliniz */
+        // SET INTERVAL BASLANGIC
+        /*setInterval(() => {
+            updateChartsNewValue(
+                Math.floor(Math.random() * 100),
+                Math.floor(Math.random() * 40),
+                Math.floor(Math.random() * 80),
+                Math.floor(Math.random() * 100),
+                Math.floor(Math.random() * 400),
+                Math.floor(Math.random() * 80),
+                Math.floor(Math.random() * 15)
+            );
+        }, 2000);
+        */
+        // SET INTERVAL BITIS
+    </script>
+
+
+
+</body>
+
+</html>

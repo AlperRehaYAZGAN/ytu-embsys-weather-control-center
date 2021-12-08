@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+
+    <link href="https://netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet"
+        id="bootstrap-css">
+    <script src="https://netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+
+</head>
+
+<body>
+    <div class="container">
+        <center>
+            <h3 class="display-1">{{ msg }}</h3>
+        </center>
+        </p>
+        <div class="row">
+            <div class="panel panel-primary filterable">
+                <div class="panel-heading">
+                    <h1 class="panel-title">Kayıtlar</h1>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <td>Lux</td>
+                            <td>Air</td>
+                            <td>Temperature</td>
+                            <td>Humidity</td>
+                            <td>Water Level</td>
+                            <td>Water Temperature</td>
+                            <td>Model Result</td>
+                            <td>Tarih</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in rows %}
+
+                        <tr>
+                            <td><a href="{{row[0]}}">{{row[0]}}</a></td>
+                            <td><a href="{{row[1]}}">{{row[1]}}</a></td>
+                            <td><a href="{{row[2]}}">{{row[2]}}</a></td>
+                            <td><a href="{{row[3]}}">{{row[3]}}</a></td>
+                            <td><a href="{{row[4]}}">{{row[4]}}</a></td>
+                            <td><a href="{{row[5]}}">{{row[5]}}</a></td>
+                            <td><a href="{{row[6]}}">{{row[6]}}</a></td>
+                            <td><a href="{{row[7]}}">{{row[7]}}</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <a href="/">Ana Sayfaya Geri Dön</a>
+                    </h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

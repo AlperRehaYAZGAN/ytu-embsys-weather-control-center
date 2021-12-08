@@ -1,0 +1,18 @@
+# env files
+.env
+*.env
+.env.*
+*.env.*
+
+# sqlite database file
+data/*
+
+# virtual python env
+.venv
+/venv
+
+/__pycache__
+
+# stream file
+stream.jpg
+stream.jpeg
