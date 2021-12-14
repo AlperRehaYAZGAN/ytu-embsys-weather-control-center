@@ -18,16 +18,16 @@ class EntrySqlite():
     dbpath = os.path.join(os.path.dirname(__file__), "data", "database.sq3")    
     def __init__(self):
         conn = sqlite3.connect(self.dbpath)
-        conn.execute('CREATE TABLE IF NOT EXISTS entries ( lux integer, air integer, temp integer, humidity integer, water_level integer, water_temp integer, model_result integer, created_at text )')
+        conn.execute('CREATE TABLE IF NOT EXISTS entries ( lux integer, air integer, temp integer, humidity integer, water_level integer, created_at text )')
         print("Table created successfully")
         pass
     
-    def save(self,lux,air,temp,humidity,water_level,water_temp,model_result):
+    def save(self,lux,air,temp,humidity,water_level):
         isOk = False
         try:
             with sqlite3.connect(self.dbpath) as con:
                 cur = con.cursor()
-                cur.execute("INSERT INTO entries (lux,air,temp,humidity, water_level,water_temp,model_result,created_at) VALUES (?,?,?,?,?,?,?,?)",(lux,air,temp, humidity, water_level,water_temp, model_result,dt.datetime.now()) )
+                cur.execute("INSERT INTO entries (lux,air,temp,humidity, water_level,created_at) VALUES (?,?,?,?,?,?,?,?)",(lux,air,temp, humidity, water_level,dt.datetime.now()) )
                 con.commit()
                 isOk = True
                 pass
@@ -68,12 +68,11 @@ def save_sensor_values():
     lux = int(request.args.get('lux',0))
     humidity = int(request.args.get('humidity',0))
     water_level = int(request.args.get('wlevel',0))
-    water_temp = int(request.args.get('wtemp',0))
 
     try:
         isOk = database.save(lux,air_quality,temperature,humidity,water_level,water_temp,0)
         if(air_quality == 0 and temperature == 0 and lux == 0):
-            return "No sensor value ensured. Usage: http://SERVER/save?air=10&temp=10&lux=10&wtemp=20&wlevel=10&humidity=20"
+            return "No sensor value ensured. Usage: http://SERVER/save?air=10&temp=10&lux=10&wlevel=10&humidity=20"
         else:
             return "Saved successfully"
     except:
@@ -93,10 +92,9 @@ def emit_new_values():
     lux = int(request.args.get('lux',0))
     humidity = int(request.args.get('humidity',0))
     water_level = int(request.args.get('wlevel',0))
-    water_temp = int(request.args.get('wtemp',0))
 
     if(air_quality == 0 and lux == 0 and temperature == 0):
-        return "No value ensured usage: http://SERVER/new?air=10&temp=10&lux=10&wtemp=20&wlevel=10&humidity=20"
+        return "No value ensured usage: http://SERVER/new?air=10&temp=10&lux=10&wlevel=10&humidity=20"
     
     new_values = {
         "air" : air_quality,
@@ -104,8 +102,6 @@ def emit_new_values():
         "temp" : temperature,
         "humidity" : humidity,
         "wlevel" : water_level,
-        "wtemp" : water_temp,
-        "result" : 0
     }
 
     # send sensor values to dashboard
@@ -116,7 +112,7 @@ def emit_new_values():
         pass
     # save entries to database
     try:
-        database.save(lux,air_quality,temperature,humidity,water_level,water_temp,0)
+        database.save(lux,air_quality,temperature,humidity,water_level)
         print("Kaydedildi")
         pass
     except:

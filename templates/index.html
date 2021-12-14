@@ -310,34 +310,7 @@
             chartWTemp.render();
             $('#latest_date').text(new Date().toLocaleString());
             let message = "İçerik Yok";
-            switch (valueResult) {
-                case 0:
-                    message = "Aksiyon yok";
-                    break;
-                case 1:
-                    message = "Işığı Aç";
-                    break;
-                case 2:
-                    message = "Fanı Aç";
-                    break;
-                case 3:
-                    message = "Havayı Isıt";
-                    break;
-                case 4:
-                    message = "Işığı Aç + Fanı Aç";
-                    break;
-                case 5:
-                    message = "Işığı Aç + Havayı Isıt";
-                    break;
-                case 6:
-                    message = "Fanı Aç + Havayı Isıt";
-                    break;
-                case 7:
-                    message = "Işığı Aç + Fanı Aç + Havayı Isıt";
-                    break;
-                default:
-                    break;
-            }
+            
             $('#txtresult').text(message);
         };
 
