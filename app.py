@@ -27,7 +27,7 @@ class EntrySqlite():
         try:
             with sqlite3.connect(self.dbpath) as con:
                 cur = con.cursor()
-                cur.execute("INSERT INTO entries (lux,air,temp,humidity, water_level,created_at) VALUES (?,?,?,?,?,?,?,?)",(lux,air,temp, humidity, water_level,dt.datetime.now()) )
+                cur.execute("INSERT INTO entries (lux,air,temp,humidity, water_level,created_at) VALUES (?,?,?,?,?,?)",(lux,air,temp, humidity, water_level,dt.datetime.now()) )
                 con.commit()
                 isOk = True
                 pass
@@ -63,11 +63,11 @@ def get_all():
 
 @app.route('/save')
 def save_sensor_values():
-    air_quality = int(request.args.get('air',0))
-    temperature = int(request.args.get('temp',0))
-    lux = int(request.args.get('lux',0))
-    humidity = int(request.args.get('humidity',0))
-    water_level = int(request.args.get('wlevel',0))
+    air_quality = float(request.args.get('air',0))
+    temperature = float(request.args.get('temp',0))
+    lux = float(request.args.get('lux',0))
+    humidity = float(request.args.get('humidity',0))
+    water_level = float(request.args.get('wlevel',0))
 
     try:
         isOk = database.save(lux,air_quality,temperature,humidity,water_level,water_temp,0)
@@ -87,11 +87,11 @@ def get_db_all():
 
 @app.route('/new')
 def emit_new_values():
-    air_quality = int(request.args.get('air',0))
-    temperature = int(request.args.get('temp',0))
-    lux = int(request.args.get('lux',0))
-    humidity = int(request.args.get('humidity',0))
-    water_level = int(request.args.get('wlevel',0))
+    air_quality = float(request.args.get('air',0))
+    temperature = float(request.args.get('temp',0))
+    lux = float(request.args.get('lux',0))
+    humidity = float(request.args.get('humidity',0))
+    water_level = float(request.args.get('wlevel',0))
 
     if(air_quality == 0 and lux == 0 and temperature == 0):
         return "No value ensured usage: http://SERVER/new?air=10&temp=10&lux=10&wlevel=10&humidity=20"
