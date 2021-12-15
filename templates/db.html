@@ -5,13 +5,11 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>YTU Embedded Systems Meteorology - History</title>
 
-
-    <link href="https://netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet"
-        id="bootstrap-css">
-    <script src="https://netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
-    <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <link href="{{url_for('static',filename='css/bootstrap.min.css')}}" rel="stylesheet">
+    <script src="{{url_for('static',filename='js/bootstrap.bundle.min.js')}}" ></script>
+    <script src="{{url_for('static',filename='js/jquery-3.3.1.min.js')}}" ></script>
 
 </head>
 
@@ -24,13 +22,13 @@
         <div class="row">
             <div class="panel panel-primary filterable">
                 <div class="panel-heading">
-                    <h1 class="panel-title">Kayıtlar</h1>
+                    <h1 class="panel-title">Entries</h1>
                 </div>
                 <table class="table">
                     <thead>
                         <tr>
                             <td>Lux</td>
-                            <td>Air</td>
+                            <td>Air Pressure</td>
                             <td>Temperature</td>
                             <td>Humidity</td>
                             <td>Water Level</td>

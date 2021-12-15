@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YTU Embedded Systems Meteorology App - Monitor</title>
+
+
+    <link href="{{url_for('static',filename='css/bootstrap.min.css')}}" rel="stylesheet">
+    <script src="{{url_for('static',filename='js/bootstrap.bundle.min.js')}}" ></script>
+    <script src="{{url_for('static',filename='js/jquery-3.3.1.min.js')}}" ></script>
+
+
+</head>
+
+<body style="font-family: Helvetica">
+
+
+    <div class="container">
+        <div class="row">
+            <br>
+            <br>
+        </div>
+        <div class="row">
+            <div class="card col-md-12">
+                <div class="well well-sm">
+                    <div class="row">
+                        <div class="col-md-12 text-center">
+                            <br>
+                            <br>
+                            <h2 class="rating-num">
+                                Raspberry Pi Meteorology App Monitor Dashboard
+                            </h2>
+                            <h4>
+                                Latest Connection : <span id="latest_date">No value found! Check your connection</span>
+                            </h4>
+                            <br>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="card col-md-4">
+                <br>
+                <div class="well well-sm shadow p-3 mb-5 bg-white rounded">
+                    <div class="row">
+
+                        <div class="col-md-12">
+
+                            <!-- HERE IT IS CHART -->
+                            <div id="charttemp" style="height: 360px; width:100%;"></div>
+
+                            <!-- end row -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card col-md-4">
+                <br>
+                <div class="well well-sm shadow p-3 mb-5 bg-white rounded">
+                    <div class="row">
+
+                        <div class="col-md-12">
+
+                            <!-- HERE IT IS CHART -->
+                            <div id="charthumidity" style="height: 360px; width:100%;"></div>
+
+                            <!-- end row -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card col-md-4">
+                <br>
+                <div class="well well-sm shadow p-3 mb-5 bg-white rounded">
+                    <div class="row">
+
+                        <div class="col-md-12">
+
+                            <!-- HERE IT IS CHART -->
+                            <div id="chartPressure" style="height: 360px; width:100%;"></div>
+
+                            <!-- end row -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="card col-md-4">
+                <br>
+                <div class="well well-sm shadow p-3 mb-5 bg-white rounded">
+                    <div class="row">
+
+                        <div class="col-md-12">
+
+                            <!-- HERE IT IS CHART -->
+                            <div id="chartlux" style="height: 360px; width:100%;"></div>
+
+                            <!-- end row -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card col-md-4">
+                <br>
+                <div class="well well-sm shadow p-3 mb-5 bg-white rounded">
+                    <div class="row">
+
+                        <div class="col-md-12">
+
+                            <!-- HERE IT IS CHART -->
+                            <div id="charIsRaining" style="height: 360px; width:100%;"></div>
+
+                            <!-- end row -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card col-md-4">
+                <br>
+                <div class="well well-sm shadow p-3 mb-5 bg-white rounded">
+                    <div class="row">
+
+                        <div class="col-md-12">
+
+                            <!-- HERE IT IS CHART -->
+                            <div id="chartGasLeak" style="height: 360px; width:100%;"></div>
+
+                            <!-- end row -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
+        integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
+        crossorigin="anonymous"></script>
+    <script type="text/javascript" charset="utf-8">
+        var arrLux = [];
+        var arrPressure = [];
+        var arrTemp = [];
+        var arrIsRaining = [];
+        var arrGasLeak = [];
+        var arrHumidity = [];
+
+        var dataLength = 10; // MAX DATA POINTS
+
+        var xHumidityVal = 0;
+        var yHumidityVal = 100;
+        var chartHumidity = new CanvasJS.Chart("charthumidity", {
+            animationEnabled: true,
+            zoomEnabled: true,
+            title: {
+                text: "Humidity (%0-100)"
+            },
+            data: [{
+                type: "line",
+                dataPoints: arrHumidity
+            }]
+        });
+
+
+        var xWLevelVal = 0;
+        var yWLevelVal = 100;
+        var charIsRaining = new CanvasJS.Chart("charIsRaining", {
+            animationEnabled: true,
+            zoomEnabled: true,
+            title: {
+                text: "Is Raining (0-1)"
+            },
+            data: [{
+                type: "line",
+                dataPoints: arrIsRaining
+            }]
+        });
+
+        var xWTempVal = 0;
+        var yWTempVal = 100;
+        var chartGasLeak = new CanvasJS.Chart("chartGasLeak", {
+            animationEnabled: true,
+            zoomEnabled: true,
+            title: {
+                text: "Gas Leak (0-1)"
+            },
+            data: [{
+                type: "line",
+                dataPoints: arrGasLeak
+            }]
+        });
+
+        var xAirVal = 0;
+        var yAirVal = 100;
+        var chartPressure = new CanvasJS.Chart("chartPressure", {
+            animationEnabled: true,
+            zoomEnabled: true,
+            title: {
+                text: "Pressure (0-1000) "
+            },
+            data: [{
+                type: "line",
+                dataPoints: arrPressure
+            }]
+        });
+        var xLuxVal = 0;
+        var yLuxVal = 100;
+        var chartLux = new CanvasJS.Chart("chartlux", {
+            animationEnabled: true,
+            zoomEnabled: true,
+            title: {
+                text: "Lux Sensor (0-100)"
+            },
+            data: [{
+                type: "line",
+                dataPoints: arrLux
+            }]
+        });
+        var xTempVal = 0;
+        var yTempVal = 100;
+        var chartTemp = new CanvasJS.Chart("charttemp", {
+            animationEnabled: true,
+            zoomEnabled: true,
+            title: {
+                text: "Temperature Sensor (*C - 0-100)"
+            },
+            data: [{
+                type: "line",
+                dataPoints: arrTemp
+            }]
+        });
+
+
+        var updateChartsNewValue = function ( val_temp, val_humidity, val_pressure, val_lux, val_isRaining, val_gasLeak) {
+            // update Water Temp
+            arrHumidity.push({
+                x: xHumidityVal,
+                y: val_humidity
+            });
+            xHumidityVal++;
+            if (arrHumidity.length > dataLength) {
+                arrHumidity.shift();
+            }
+
+            // update Water Temp
+            arrGasLeak.push({
+                x: xWTempVal,
+                y: val_gasLeak
+            });
+            xWTempVal++;
+            if (arrGasLeak.length > dataLength) {
+                arrGasLeak.shift();
+            }
+
+            // update Water Level
+            arrIsRaining.push({
+                x: xWLevelVal,
+                y: val_isRaining
+            });
+            xWLevelVal++;
+            if (arrIsRaining.length > dataLength) {
+                arrIsRaining.shift();
+            }
+
+            // update air
+            arrPressure.push({
+                x: xAirVal,
+                y: val_pressure
+            });
+            xAirVal++;
+            if (arrPressure.length > dataLength) {
+                arrPressure.shift();
+            }
+
+            // update temp
+            arrTemp.push({
+                x: xTempVal,
+                y: val_temp
+            });
+            xTempVal++;
+            if (arrTemp.length > dataLength) {
+                arrTemp.shift();
+            }
+
+            // update lux
+            arrLux.push({
+                x: xLuxVal,
+                y: val_lux
+            });
+            xLuxVal++;
+            if (arrLux.length > dataLength) {
+                arrLux.shift();
+            }
+
+            chartPressure.render();
+            chartLux.render();
+            chartTemp.render();
+            chartHumidity.render();
+            charIsRaining.render();
+            chartGasLeak.render();
+            $('#latest_date').text(new Date().toISOString());
+            let message = "No Content";
+            
+            $('#txtresult').text(message);
+        };
+
+        var socket = io();
+        socket.on('connect', function () {
+            console.log("Connected sto admin dasboard server.");
+        });
+
+        // update sensor values
+        socket.on('new-values', function (data) {
+            $('#txtdate').text(latest_date);
+            console.log(data);
+            updateChartsNewValue(data.temp, data.humidity, data.pressure, data.lux, data.is_raining, data.gas_leak);
+
+        });
+
+        /* Deneme modunu kapatmak icin asagi baslangic ve bitis kismini yorum satirina aliniz */
+        // SET INTERVAL BASLANGIC
+        /*setInterval(() => {
+            updateChartsNewValue(
+                Math.floor(Math.random() * 100),
+                Math.floor(Math.random() * 40),
+                Math.floor(Math.random() * 80),
+                Math.floor(Math.random() * 100),
+                Math.floor(Math.random() * 400),
+                Math.floor(Math.random() * 80),
+                Math.floor(Math.random() * 15)
+            );
+        }, 2000);
+        */
+        // SET INTERVAL BITIS
+    </script>
+
+
+
+</body>
+
+</html>
