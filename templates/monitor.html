@@ -82,7 +82,7 @@
                         <div class="col-md-12">
 
                             <!-- HERE IT IS CHART -->
-                            <div id="chartPressure" style="height: 360px; width:100%;"></div>
+                            <div id="chartBmpPressure" style="height: 360px; width:100%;"></div>
 
                             <!-- end row -->
                         </div>
@@ -137,6 +137,53 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="card col-md-4">
+                <br>
+                <div class="well well-sm shadow p-3 mb-5 bg-white rounded">
+                    <div class="row">
+
+                        <div class="col-md-12">
+
+                            <!-- HERE IT IS CHART -->
+                            <div id="chartBmpSeaLevelTemp" style="height: 360px; width:100%;"></div>
+
+                            <!-- end row -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card col-md-4">
+                <br>
+                <div class="well well-sm shadow p-3 mb-5 bg-white rounded">
+                    <div class="row">
+
+                        <div class="col-md-12">
+
+                            <!-- HERE IT IS CHART -->
+                            <div id="chartBmpAltitude" style="height: 360px; width:100%;"></div>
+
+                            <!-- end row -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card col-md-4">
+                <br>
+                <div class="well well-sm shadow p-3 mb-5 bg-white rounded">
+                    <div class="row">
+
+                        <div class="col-md-12">
+
+                            <!-- HERE IT IS CHART -->
+                            <div id="chartBmpTemp" style="height: 360px; width:100%;"></div>
+
+                            <!-- end row -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     </div>
 
@@ -150,14 +197,19 @@
         crossorigin="anonymous"></script>
     <script type="text/javascript" charset="utf-8">
         var arrLux = [];
-        var arrPressure = [];
         var arrTemp = [];
         var arrIsRaining = [];
         var arrGasLeak = [];
         var arrHumidity = [];
+        var arrBmpPressure = [];
+        var arrBmpSeaLevelTemp = [];
+        var arrBmpAltitude = [];
+        var arrBmpTemp = [];
 
         var dataLength = 10; // MAX DATA POINTS
 
+
+        // humidity
         var xHumidityVal = 0;
         var yHumidityVal = 100;
         var chartHumidity = new CanvasJS.Chart("charthumidity", {
@@ -173,6 +225,7 @@
         });
 
 
+        // is raining
         var xWLevelVal = 0;
         var yWLevelVal = 100;
         var charIsRaining = new CanvasJS.Chart("charIsRaining", {
@@ -187,6 +240,7 @@
             }]
         });
 
+        // gas leak
         var xWTempVal = 0;
         var yWTempVal = 100;
         var chartGasLeak = new CanvasJS.Chart("chartGasLeak", {
@@ -201,9 +255,10 @@
             }]
         });
 
+        // pressure
         var xAirVal = 0;
         var yAirVal = 100;
-        var chartPressure = new CanvasJS.Chart("chartPressure", {
+        var chartBmpPressure = new CanvasJS.Chart("chartBmpPressure", {
             animationEnabled: true,
             zoomEnabled: true,
             title: {
@@ -211,9 +266,11 @@
             },
             data: [{
                 type: "line",
-                dataPoints: arrPressure
+                dataPoints: arrBmpPressure
             }]
         });
+
+        // lux
         var xLuxVal = 0;
         var yLuxVal = 100;
         var chartLux = new CanvasJS.Chart("chartlux", {
@@ -227,6 +284,8 @@
                 dataPoints: arrLux
             }]
         });
+
+        // dht temp
         var xTempVal = 0;
         var yTempVal = 100;
         var chartTemp = new CanvasJS.Chart("charttemp", {
@@ -241,19 +300,83 @@
             }]
         });
 
+        // bmp sea level temp
+        var xBmpSeaLevelTempVal = 0;
+        var yBmpSeaLevelTempVal = 100;
+        var chartBmpSeaLevelTemp = new CanvasJS.Chart("chartBmpSeaLevelTemp", {
+            animationEnabled: true,
+            zoomEnabled: true,
+            title: {
+                text: "BMP Sea Level Temp (*C - 0-100)"
+            },
+            data: [{
+                type: "line",
+                dataPoints: arrBmpSeaLevelTemp
+            }]
+        });
 
-        var updateChartsNewValue = function ( val_temp, val_humidity, val_pressure, val_lux, val_isRaining, val_gasLeak) {
-            // update Water Temp
+        // bmp altitude
+        var xBmpAltitudeVal = 0;
+        var yBmpAltitudeVal = 100;
+        var chartBmpAltitude = new CanvasJS.Chart("chartBmpAltitude", {
+            animationEnabled: true,
+            zoomEnabled: true,
+            title: {
+                text: "BMP Altitude (0-100)"
+            },
+            data: [{
+                type: "line",
+                dataPoints: arrBmpAltitude
+            }]
+        });
+
+        // bmp temp
+        var xBmpTempVal = 0;
+        var yBmpTempVal = 100;
+        var chartBmpTemp = new CanvasJS.Chart("chartBmpTemp", {
+            animationEnabled: true,
+            zoomEnabled: true,
+            title: {
+                text: "BMP Temperature (*C - 0-100)"
+            },
+            data: [{
+                type: "line",
+                dataPoints: arrBmpTemp
+            }]
+        });
+
+        /* 
+                        'temp': temp,
+            'humidity': humidity,
+            'pressure': pressure,
+            'lux': lux,
+            'is_raining': is_raining,
+            'gas_leak': gas_leak,
+            'bmp_temp': bmp_temp,
+            'bmp_pressure': bmp_pressure,
+            'bmp_altitude': bmp_altitude,
+            'bmp_sealevel_pressure': bmp_sealevel_pressure
+            */
+        var updateChartsNewValue = function ( val_dhtTemp,val_dhtHumidity, 
+         val_lux, 
+         val_isRaining, 
+         val_gasLeak, 
+         val_bmtSeaPressure, 
+         val_BmpAltitude,
+         val_BmpPressure,
+         val_BmpTemp
+         ) {
+            // humidity
             arrHumidity.push({
                 x: xHumidityVal,
-                y: val_humidity
+                y: val_dhtHumidity
             });
             xHumidityVal++;
             if (arrHumidity.length > dataLength) {
                 arrHumidity.shift();
             }
 
-            // update Water Temp
+            // gas leak
             arrGasLeak.push({
                 x: xWTempVal,
                 y: val_gasLeak
@@ -263,7 +386,7 @@
                 arrGasLeak.shift();
             }
 
-            // update Water Level
+            // is raining
             arrIsRaining.push({
                 x: xWLevelVal,
                 y: val_isRaining
@@ -273,27 +396,27 @@
                 arrIsRaining.shift();
             }
 
-            // update air
-            arrPressure.push({
+            // bmp pressure
+            arrBmpPressure.push({
                 x: xAirVal,
-                y: val_pressure
+                y: val_BmpPressure
             });
             xAirVal++;
-            if (arrPressure.length > dataLength) {
-                arrPressure.shift();
+            if (arrBmpPressure.length > dataLength) {
+                arrBmpPressure.shift();
             }
 
-            // update temp
+            // dht temp
             arrTemp.push({
                 x: xTempVal,
-                y: val_temp
+                y: val_dhtTemp
             });
             xTempVal++;
             if (arrTemp.length > dataLength) {
                 arrTemp.shift();
             }
 
-            // update lux
+            // lux
             arrLux.push({
                 x: xLuxVal,
                 y: val_lux
@@ -303,12 +426,48 @@
                 arrLux.shift();
             }
 
-            chartPressure.render();
+            // bmp sea level temp
+            arrBmpSeaLevelTemp.push({
+                x: xBmpSeaLevelTempVal,
+                y: val_bmtSeaPressure
+            });
+            xBmpSeaLevelTempVal++;
+            if (arrBmpSeaLevelTemp.length > dataLength) {
+                arrBmpSeaLevelTemp.shift();
+            }
+
+            // bmp altitude
+            arrBmpAltitude.push({
+                x: xBmpAltitudeVal,
+                y: val_BmpAltitude
+            });
+            xBmpAltitudeVal++;
+            if (arrBmpAltitude.length > dataLength) {
+                arrBmpAltitude.shift();
+            }
+
+            // bmp temp
+            arrBmpTemp.push({
+                x: xBmpTempVal,
+                y: val_BmpTemp
+            });
+            xBmpTempVal++;
+            if (arrBmpTemp.length > dataLength) {
+                arrBmpTemp.shift();
+            }
+
+
+
+            // update charts
+            chartBmpPressure.render();
             chartLux.render();
             chartTemp.render();
             chartHumidity.render();
             charIsRaining.render();
             chartGasLeak.render();
+            chartBmpSeaLevelTemp.render();
+            chartBmpAltitude.render();
+            chartBmpTemp.render();
             $('#latest_date').text(new Date().toISOString());
             let message = "No Content";
             
@@ -324,8 +483,7 @@
         socket.on('new-values', function (data) {
             $('#txtdate').text(latest_date);
             console.log(data);
-            updateChartsNewValue(data.temp, data.humidity, data.pressure, data.lux, data.is_raining, data.gas_leak);
-
+            updateChartsNewValue(data.temp, data.humidity, data.lux, data.is_raining, data.gas_leak, data.bmp_sealevel_pressure, data.bmp_altitude, data.bmp_pressure, data.bmp_temp);
         });
 
         /* Deneme modunu kapatmak icin asagi baslangic ve bitis kismini yorum satirina aliniz */
