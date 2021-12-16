@@ -11,22 +11,29 @@ class EntryDB():
     def __init__(self):
         # connect to db
         conn = sqlite3.connect(self.dbpath)
+
         # create table
         create_sql = """
             CREATE TABLE IF NOT EXISTS entries (
                 temp REAL,
                 humidity REAL,
                 lux REAL,
-                pressure REAL,
                 is_raining INTEGER,
+                gas_leak INTEGER,
+                bmp_temp REAL,
+                bmp_pressure REAL,
+                bmp_altitude REAL,
+                bmp_sealevel_pressure REAL,
                 created_at DATETIME
             );
         """
+        print("Creating table...")
         conn.execute(create_sql)
+        print("Table created.")
         pass
 
     # get all entries from db
-    def find(self, limit=10, offset=0):
+    def find(self, limit=1000, offset=0):
         con = sqlite3.connect(self.dbpath)
         con.row_factory = sqlite3.Row
         
@@ -39,11 +46,11 @@ class EntryDB():
     pass
     
     # save entry to db
-    def save(self,temp,humidity,lux,pressure,is_raining):
+    def save(self,temp,humidity,lux,is_raining,gas_leak,bmp_temp,bmp_pressure,bmp_altitude,bmp_sealevel_pressure):
         try:
             with sqlite3.connect(self.dbpath) as con:
                 cur = con.cursor()
-                cur.execute("INSERT INTO entries (temp, humidity, lux, pressure, is_raining, created_at) VALUES (?,?,?,?,?,?)", (temp,humidity,lux,pressure,is_raining,dt.datetime.now()))
+                cur.execute("INSERT INTO entries (temp,humidity,lux,is_raining,gas_leak,bmp_temp,bmp_pressure,bmp_altitude,bmp_sealevel_pressure,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)", (temp,humidity,lux,is_raining,gas_leak,bmp_temp,bmp_pressure,bmp_altitude,bmp_sealevel_pressure,dt.datetime.now()))
                 con.commit()
                 pass
         except:

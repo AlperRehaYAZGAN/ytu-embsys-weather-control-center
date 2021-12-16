@@ -68,7 +68,6 @@ def save_sensor_values():
     # sensor values temp,humidity,pressure,lux,is_raining,gas_leak
     temp = float(request.args.get('temp',0))
     humidity = float(request.args.get('humidity',0))
-    pressure = float(request.args.get('pressure',0))
     lux = float(request.args.get('lux',0))
     is_raining = int(request.args.get('is_raining',0))
     gas_leak = int(request.args.get('gas_leak',0))
@@ -84,14 +83,14 @@ def save_sensor_values():
     }
 
     # check all values not default
-    if not(temp != 0 and humidity != 0):
+    if (temp == 0 and humidity == 0):
         resp['status'] = False
-        resp['msg'] = "Lütfen tüm değerleri giriniz. Example: /save?temp=23.5&humidity=45.6&pressure=12.3&lux=12.3&is_raining=1&gas_leak=1"
+        resp['msg'] = "Lutfen tum degerleri giriniz. Example: /save?temp=23.5&humidity=45.6&pressure=12.3&lux=12.3&is_raining=1&gas_leak=1"
         return resp
 
     # save to db
     try:
-        entryDB.save(temp,humidity,lux,pressure,is_raining,gas_leak)
+        entryDB.save(temp,humidity,lux,is_raining,gas_leak,bmp_temp,bmp_pressure,bmp_altitude,bmp_sealevel_pressure)
         pass
     except:
         print("Error saving to db.")
@@ -99,10 +98,9 @@ def save_sensor_values():
 
     # emit new values to all clients
     try:
-        emit('new_values', {
+        socketio.emit('new-values', {
             'temp': temp,
             'humidity': humidity,
-            'pressure': pressure,
             'lux': lux,
             'is_raining': is_raining,
             'gas_leak': gas_leak,
